@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 
-# --- Granulation Time Calculation (in minutes) ---
+# --- Granulation Time Calculation (in seconds) ---
 def granulation_time_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, N_large):
     D_small = D_small_mm / 1000  # Convert to meters
     D_large = D_large_mm / 1000
@@ -15,7 +15,7 @@ def granulation_time_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_m
     else:
         st.error("Invalid method selected.")
         return None
-    return round(t_large_min, 2)  # Output in minutes
+    return round(t_large_min * 60, 2)  # Return in seconds
 
 # --- Impeller RPM Calculation ---
 def impeller_rpm_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, t_large_sec):
@@ -53,7 +53,7 @@ def main():
     if st.button("🕒 Calculate Granulation Time"):
         result = granulation_time_scaleup(method_time, D_small, N_small, t_small_sec, D_large, N_large)
         if result is not None:
-            st.success(f"Scaled Granulation Time (Large Scale): **{result} minutes**")
+            st.success(f"Scaled Granulation Time (Large Scale): **{result} seconds**")
 
     st.markdown("---")
 
