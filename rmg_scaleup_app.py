@@ -35,16 +35,27 @@ def impeller_rpm_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, t
         return None
     return round(N_large, 2)  # RPM
 
+def get_input_with_manual(label, slider_min, slider_max, slider_default, key):
+    # Checkbox to enable manual input
+    use_manual = st.checkbox(f"Manual input for {label}?", key=f"manual_{key}")
+    
+    if use_manual:
+        val = st.number_input(f"Enter {label} (manual)", min_value=slider_min, max_value=slider_max, value=slider_default, key=f"manual_value_{key}")
+    else:
+        val = st.slider(label, slider_min, slider_max, slider_default, key=key)
+    return val
+
 def main():
     st.title("RMG Scale-Up Calculator")
 
     st.header("1️⃣ Granulation Time Scale-Up Calculator")
-    method_time = st.selectbox("Method", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"])
-    D_small_time = st.slider("D_small (mm)", 50, 1000, 200)
-    N_small_time = st.slider("N_small (RPM)", 10, 200, 100)
-    t_small_time = st.slider("t_small (sec)", 10, 600, 180)
-    D_large_time = st.slider("D_large (mm)", 100, 2000, 600)
-    N_large_time = st.slider("N_large (RPM)", 10, 200, 50)
+    method_time = st.selectbox("Method", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"], key="method_time")
+    
+    D_small_time = get_input_with_manual("D_small (mm)", 50, 1000, 200, "D_small_time")
+    N_small_time = get_input_with_manual("N_small (RPM)", 10, 200, 100, "N_small_time")
+    t_small_time = get_input_with_manual("t_small (sec)", 10, 600, 180, "t_small_time")
+    D_large_time = get_input_with_manual("D_large (mm)", 100, 2000, 600, "D_large_time")
+    N_large_time = get_input_with_manual("N_large (RPM)", 10, 200, 50, "N_large_time")
 
     if st.button("Calculate Granulation Time"):
         result = granulation_time_scaleup(method_time, D_small_time, N_small_time, t_small_time, D_large_time, N_large_time)
@@ -55,11 +66,12 @@ def main():
 
     st.header("2️⃣ Impeller RPM Scale-Up Calculator")
     method_rpm = st.selectbox("Method (RPM Calculator)", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"], key="method_rpm")
-    D_small_rpm = st.slider("D_small (mm)", 50, 1000, 200, key="D_small_rpm")
-    N_small_rpm = st.slider("N_small (RPM)", 10, 200, 100, key="N_small_rpm")
-    t_small_rpm = st.slider("t_small (sec)", 10, 600, 180, key="t_small_rpm")
-    D_large_rpm = st.slider("D_large (mm)", 100, 2000, 600, key="D_large_rpm")
-    t_large_rpm = st.slider("t_large (sec)", 10, 600, 120, key="t_large_rpm")
+    
+    D_small_rpm = get_input_with_manual("D_small (mm)", 50, 1000, 200, "D_small_rpm")
+    N_small_rpm = get_input_with_manual("N_small (RPM)", 10, 200, 100, "N_small_rpm")
+    t_small_rpm = get_input_with_manual("t_small (sec)", 10, 600, 180, "t_small_rpm")
+    D_large_rpm = get_input_with_manual("D_large (mm)", 100, 2000, 600, "D_large_rpm")
+    t_large_rpm = get_input_with_manual("t_large (sec)", 10, 600, 120, "t_large_rpm")
 
     if st.button("Calculate Large Scale RPM"):
         result = impeller_rpm_scaleup(method_rpm, D_small_rpm, N_small_rpm, t_small_rpm, D_large_rpm, t_large_rpm)
@@ -68,3 +80,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
