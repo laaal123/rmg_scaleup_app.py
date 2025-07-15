@@ -14,7 +14,7 @@ def granulation_time_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_m
     else:
         st.error("Invalid method selected.")
         return None
-    return round(t_large_min * 60, 2)  # seconds
+    return round(t_large_min, 2)  # minutes
 
 def impeller_rpm_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, t_large_sec):
     D_small = D_small_mm / 1000
@@ -36,9 +36,7 @@ def impeller_rpm_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, t
     return round(N_large, 2)  # RPM
 
 def get_input_with_manual(label, slider_min, slider_max, slider_default, key):
-    # Checkbox to enable manual input
     use_manual = st.checkbox(f"Manual input for {label}?", key=f"manual_{key}")
-    
     if use_manual:
         val = st.number_input(f"Enter {label} (manual)", min_value=slider_min, max_value=slider_max, value=slider_default, key=f"manual_value_{key}")
     else:
@@ -60,7 +58,7 @@ def main():
     if st.button("Calculate Granulation Time"):
         result = granulation_time_scaleup(method_time, D_small_time, N_small_time, t_small_time, D_large_time, N_large_time)
         if result is not None:
-            st.success(f"Scaled Granulation Time (Large Scale): {result} seconds")
+            st.success(f"🕒 Scaled Granulation Time (Large Scale): {result} minutes")
 
     st.markdown("---")
 
@@ -68,16 +66,15 @@ def main():
     method_rpm = st.selectbox("Method (RPM Calculator)", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"], key="method_rpm")
     
     D_small_rpm = get_input_with_manual("D_small (mm)", 50, 1000, 200, "D_small_rpm")
-    N_small_rpm = get_input_with_manual("N_small (RPM)", 10, 200, 100, "N_small_rpm")
-    t_small_rpm = get_input_with_manual("t_small (sec)", 10, 600, 180, "t_small_rpm")
+    N_small_rpm = get_input_with_manual("N_small (RPM)", 10, 1000, 100, "N_small_rpm")
+    t_small_rpm = get_input_with_manual("t_small (sec)", 10, 1000, 180, "t_small_rpm")
     D_large_rpm = get_input_with_manual("D_large (mm)", 100, 2000, 600, "D_large_rpm")
-    t_large_rpm = get_input_with_manual("t_large (sec)", 10, 600, 120, "t_large_rpm")
+    t_large_rpm = get_input_with_manual("t_large (sec)", 10, 1000, 120, "t_large_rpm")
 
     if st.button("Calculate Large Scale RPM"):
         result = impeller_rpm_scaleup(method_rpm, D_small_rpm, N_small_rpm, t_small_rpm, D_large_rpm, t_large_rpm)
         if result is not None:
-            st.success(f"Calculated Large Scale RPM: {result} RPM")
+            st.success(f"🌀 Calculated Large Scale RPM: {result} RPM")
 
 if __name__ == "__main__":
     main()
-
