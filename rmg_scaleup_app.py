@@ -51,11 +51,11 @@ def main():
     st.header("1️⃣ Granulation Time Scale-Up Calculator")
     method_time = st.selectbox("Method", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"], key="method_time")
     
-    D_small_time = get_input_with_manual("D_small (mm)", 50, 1000, 200, "D_small_time")
-    N_small_time = get_input_with_manual("N_small (RPM)", 10, 200, 100, "N_small_time")
-    t_small_time = get_input_with_manual("t_small (sec)", 10, 600, 180, "t_small_time")
-    D_large_time = get_input_with_manual("D_large (mm)", 100, 2000, 600, "D_large_time")
-    N_large_time = get_input_with_manual("N_large (RPM)", 10, 200, 50, "N_large_time")
+    D_small_time = get_input_with_manual("D_small (mm)", 10, 2000, 200, "D_small_time")
+    N_small_time = get_input_with_manual("N_small (RPM)", 10, 2000, 100, "N_small_time")
+    t_small_time = get_input_with_manual("t_small (sec)", 10, 1000, 180, "t_small_time")
+    D_large_time = get_input_with_manual("D_large (mm)", 10, 2000, 600, "D_large_time")
+    N_large_time = get_input_with_manual("N_large (RPM)", 10, 2000, 50, "N_large_time")
 
     if st.button("Calculate Granulation Time"):
         result = granulation_time_scaleup(method_time, D_small_time, N_small_time, t_small_time, D_large_time, N_large_time)
