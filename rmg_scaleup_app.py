@@ -1,10 +1,11 @@
 import streamlit as st
 import math
 
+# --- Granulation Time Calculation (in minutes) ---
 def granulation_time_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, N_large):
-    D_small = D_small_mm / 1000
+    D_small = D_small_mm / 1000  # Convert to meters
     D_large = D_large_mm / 1000
-    t_small_min = t_small_sec / 60
+    t_small_min = t_small_sec / 60  # Convert to minutes
 
     if method == "Tip Speed (Shear Matching)":
         V_small = math.pi * D_small * N_small
@@ -14,8 +15,9 @@ def granulation_time_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_m
     else:
         st.error("Invalid method selected.")
         return None
-    return round(t_large_min, 2)  # minutes
+    return round(t_large_min, 2)  # Output in minutes
 
+# --- Impeller RPM Calculation ---
 def impeller_rpm_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, t_large_sec):
     D_small = D_small_mm / 1000
     D_large = D_large_mm / 1000
@@ -33,48 +35,41 @@ def impeller_rpm_scaleup(method, D_small_mm, N_small, t_small_sec, D_large_mm, t
     else:
         st.error("Invalid method selected.")
         return None
-    return round(N_large, 2)  # RPM
+    return round(N_large, 2)
 
-def get_input_with_manual(label, slider_min, slider_max, slider_default, key):
-    use_manual = st.checkbox(f"Manual input for {label}?", key=f"manual_{key}")
-    if use_manual:
-        val = st.number_input(f"Enter {label} (manual)", min_value=slider_min, max_value=slider_max, value=slider_default, key=f"manual_value_{key}")
-    else:
-        val = st.slider(label, slider_min, slider_max, slider_default, key=key)
-    return val
-
+# --- Streamlit App ---
 def main():
-    st.title("RMG Scale-Up Calculator")
+    st.title("🔄 RMG Scale-Up Calculator")
+    st.markdown("Built for pharmaceutical granulation process scaling based on impeller diameter and speed.")
 
-    st.header("1️⃣ Granulation Time Scale-Up Calculator")
-    method_time = st.selectbox("Method", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"], key="method_time")
-    
-    D_small_time = get_input_with_manual("D_small (mm)", 10, 2000, 200, "D_small_time")
-    N_small_time = get_input_with_manual("N_small (RPM)", 10, 2000, 100, "N_small_time")
-    t_small_time = get_input_with_manual("t_small (sec)", 10, 1000, 180, "t_small_time")
-    D_large_time = get_input_with_manual("D_large (mm)", 10, 2000, 600, "D_large_time")
-    N_large_time = get_input_with_manual("N_large (RPM)", 10, 2000, 50, "N_large_time")
+    st.header("1️⃣ Granulation Time Scale-Up")
+    method_time = st.selectbox("Select Scaling Method", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"])
+    D_small = st.number_input("Small Scale Impeller Diameter (mm)", min_value=10.0, value=200.0)
+    N_small = st.number_input("Small Scale RPM", min_value=10.0, value=100.0)
+    t_small_sec = st.number_input("Small Scale Granulation Time (seconds)", min_value=1.0, value=180.0)
+    D_large = st.number_input("Large Scale Impeller Diameter (mm)", min_value=10.0, value=600.0)
+    N_large = st.number_input("Large Scale RPM", min_value=10.0, value=50.0)
 
-    if st.button("Calculate Granulation Time"):
-        result = granulation_time_scaleup(method_time, D_small_time, N_small_time, t_small_time, D_large_time, N_large_time)
+    if st.button("🕒 Calculate Granulation Time"):
+        result = granulation_time_scaleup(method_time, D_small, N_small, t_small_sec, D_large, N_large)
         if result is not None:
-            st.success(f"🕒 Scaled Granulation Time (Large Scale): {result} minutes")
+            st.success(f"Scaled Granulation Time (Large Scale): **{result} minutes**")
 
     st.markdown("---")
 
-    st.header("2️⃣ Impeller RPM Scale-Up Calculator")
-    method_rpm = st.selectbox("Method (RPM Calculator)", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"], key="method_rpm")
-    
-    D_small_rpm = get_input_with_manual("D_small (mm)", 50, 1000, 200, "D_small_rpm")
-    N_small_rpm = get_input_with_manual("N_small (RPM)", 10, 1000, 100, "N_small_rpm")
-    t_small_rpm = get_input_with_manual("t_small (sec)", 10, 1000, 180, "t_small_rpm")
-    D_large_rpm = get_input_with_manual("D_large (mm)", 100, 2000, 600, "D_large_rpm")
-    t_large_rpm = get_input_with_manual("t_large (sec)", 10, 1000, 120, "t_large_rpm")
+    st.header("2️⃣ Impeller RPM Scale-Up")
+    method_rpm = st.selectbox("Select Scaling Method (RPM)", ["Tip Speed (Shear Matching)", "Tip Distance (Total Exposure Matching)"])
+    D_small_rpm = st.number_input("Small Scale Impeller Diameter (mm)", min_value=10.0, value=200.0, key="D_small_rpm")
+    N_small_rpm = st.number_input("Small Scale RPM", min_value=10.0, value=100.0, key="N_small_rpm")
+    t_small_rpm = st.number_input("Small Scale Time (seconds)", min_value=1.0, value=180.0, key="t_small_rpm")
+    D_large_rpm = st.number_input("Large Scale Impeller Diameter (mm)", min_value=10.0, value=600.0, key="D_large_rpm")
+    t_large_rpm = st.number_input("Large Scale Time (seconds)", min_value=1.0, value=120.0, key="t_large_rpm")
 
-    if st.button("Calculate Large Scale RPM"):
+    if st.button("⚙️ Calculate Large Scale RPM"):
         result = impeller_rpm_scaleup(method_rpm, D_small_rpm, N_small_rpm, t_small_rpm, D_large_rpm, t_large_rpm)
         if result is not None:
-            st.success(f"🌀 Calculated Large Scale RPM: {result} RPM")
+            st.success(f"Required Large Scale RPM: **{result} RPM**")
 
 if __name__ == "__main__":
     main()
+
